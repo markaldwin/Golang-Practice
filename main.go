@@ -1,9 +1,13 @@
 package main
 
 import (
+	"fmt"
+	"io/ioutil"
+	"log"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/goccy/go-json"
 )
 
 type profile struct {
@@ -16,7 +20,21 @@ type profile struct {
 var profiledata = []profile{}
 
 func getProfile(c *gin.Context) {
+
 	c.IndentedJSON(http.StatusOK, profiledata)
+	var content, err = json.Marshal(profiledata)
+	content, err = ioutil.ReadFile("profile.json")
+	if err != nil {
+		// 	log.Fatal(err)
+		fmt.Println("File Does Not Exist")
+	} else {
+		err = json.Unmarshal(content, &profiledata)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s\n", content)
+	}
+
 }
 
 func postProfile(c *gin.Context) {
@@ -26,9 +44,20 @@ func postProfile(c *gin.Context) {
 		return
 	}
 
-	profiledata = append(profiledata, newProfile)
+	finalprofile := append(profiledata, newProfile)
 
 	c.IndentedJSON(http.StatusCreated, newProfile)
+
+	finalJson, err := json.Marshal(finalprofile)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("%s\n", finalJson)
+
+	err = ioutil.WriteFile("profile.json", finalJson, 0644)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 func main() {
