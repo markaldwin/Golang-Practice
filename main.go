@@ -21,16 +21,17 @@ var profiledata = []profile{}
 
 func getProfile(c *gin.Context) {
 
-	c.IndentedJSON(http.StatusOK, profiledata)
-	var content, err = json.Marshal(profiledata)
-	content, err = ioutil.ReadFile("profile.json")
+	content, err := ioutil.ReadFile("profile.json")
+
 	if err != nil {
-		// 	log.Fatal(err)
+		//log.Fatal(err)
 		fmt.Println("File Does Not Exist")
 	} else {
 		err = json.Unmarshal(content, &profiledata)
+		c.IndentedJSON(http.StatusOK, profiledata)
 		if err != nil {
 			log.Fatal(err)
+
 		}
 		fmt.Printf("%s\n", content)
 	}
